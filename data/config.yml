@@ -1,0 +1,6 @@
+storage:
+  path: "redis://127.0.0.1:6379/1"
+  key: "proxy_crawler"
+
+beggar:
+  timeout: 2
