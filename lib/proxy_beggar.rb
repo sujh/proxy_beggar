@@ -27,7 +27,7 @@ class ProxyBeggar
         _proxies.each do |proxy|
           if proxy_available?(proxy.to_s, @dest_addr)
             p "Proxy is available: proxy: #{proxy}, url: #{@dest_addr}"
-            @storage.store(proxy.ip, proxy.to_s)
+            @storage.store(proxy.to_s)
           else
             next
           end

@@ -9,16 +9,12 @@ class ProxyBeggar
       @entity = ::Redis.new(opts)
     end
 
-    def store(k, v)
-      @entity.hset(Config[:storage][:key], k, v)
-    end
-
-    def get(k)
-      @entity.hget(Config[:storage][:key], k)
+    def store(v)
+      @entity.sadd(Config[:storage][:key], v)
     end
 
     def get_all
-      @entity.hgetall(Config[:storage][:key])
+      @entity.smembers(Config[:storage][:key])
     end
   end
 end

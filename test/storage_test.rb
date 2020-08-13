@@ -16,27 +16,17 @@ describe ProxyBeggar::Storage do
 
   describe "#store" do
     it "works" do
-      proxy = { ip: '1.1.1.1' }
-      @storage.store('1.1.1.1', JSON.dump(proxy))
-      assert_equal 1, @store_entity.hlen(ProxyBeggar::Config[:storage][:key])
-    end
-  end
-
-  describe "#get" do
-    it "works" do
-      proxy = { ip: '1.1.1.2', port: '2' }
-      @storage.store('1.1.1.2', JSON.dump(proxy))
-      persisted_proxy = JSON.load @storage.get(proxy[:ip])
-      assert_equal proxy[:ip], persisted_proxy['ip']
-      assert_equal proxy[:port], persisted_proxy['port']
+      @storage.store('1.1.1.1')
+      assert_equal 1, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
     end
   end
 
   describe "#get_all" do
     it 'works' do
-      @storage.store('key1', 'v1')
-      @storage.store('key2', 'v2')
-      assert_equal({"key1"=>"v1", "key2"=>"v2"}, @storage.get_all)
+      @storage.store('v1')
+      @storage.store('v2')
+      @storage.store('v2')
+      assert_equal(%w(v1 v2).sort, @storage.get_all.sort)
     end
   end
 end
