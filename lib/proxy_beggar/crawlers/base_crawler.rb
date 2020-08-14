@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'timeout'
+require 'set'
 require_relative '../proxy'
 
 class ProxyBeggar
@@ -9,7 +10,7 @@ class ProxyBeggar
     attr_reader :proxies, :requestor
 
     def initialize
-      @proxies = []
+      @proxies = Set.new
       @requestor = Requestor.new
     end
 

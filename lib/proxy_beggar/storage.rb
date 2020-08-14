@@ -1,6 +1,5 @@
 require 'yaml'
 require 'redis'
-require 'json'
 require_relative './config.rb'
 
 class ProxyBeggar
@@ -10,7 +9,15 @@ class ProxyBeggar
     end
 
     def store(v)
-      @entity.sadd(Config[:storage][:key], v)
+      if v.respond_to?(:to_a)
+        if v.empty?
+          p "Warning: skip store for empty set"
+          return
+        end
+        @entity.sadd(Config[:storage][:key], v.to_a)
+      else
+        @entity.sadd(Config[:storage][:key], v.to_s)
+      end
     end
 
     def get_all

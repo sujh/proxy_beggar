@@ -15,9 +15,26 @@ describe ProxyBeggar::Storage do
   end
 
   describe "#store" do
-    it "works" do
+    it "works when save string" do
       @storage.store('1.1.1.1')
       assert_equal 1, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
+    end
+
+    it "works when save array" do
+      @storage.store([1,2,3])
+      assert_equal 3, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
+    end
+
+    it "works when save set" do
+      require 'set'
+      @storage.store(Set.new [0,1,2,3])
+      assert_equal 4, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
+    end
+
+    it "store failed for empty set" do
+      require 'set'
+      @storage.store(Set.new)
+      assert_equal 0, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
     end
   end
 

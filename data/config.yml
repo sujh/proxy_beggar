@@ -4,3 +4,5 @@ storage:
 
 beggar:
   timeout: 2
+  default_target: "https://www.baidu.com"
+  thread_limit: 20

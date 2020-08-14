@@ -1,10 +1,10 @@
-require 'timeout'
-require 'open-uri'
+require 'set'
 require_relative './proxy_beggar/storage'
 require_relative './proxy_beggar/requestor'
+require_relative './proxy_beggar/config'
 
 class ProxyBeggar
-  autoload(:Config, './proxy_beggar/config.rb')
+  THREAD_LIMIT = Config[:beggar][:thread_limit].to_f
   attr_reader :requestor
 
   def initialize
@@ -12,55 +12,24 @@ class ProxyBeggar
     @requestor = Requestor.new
   end
 
-  def beg_all(detect_site = "https://www.baidu.com")
-    load_crawlers.each do |crawler|
-      beg_to crawler.new, detect_site
-    end
-  end
-
-  def beg_to(crawler, detect_site)
-    threads = []
-    #crawler.requestor.proxy = pick_proxy_for(crawler.url)
-    crawler.run.each_slice(5) do |_proxies|
+  def beg(crawlers: load_crawlers, target: Config[:beggar][:default_target])
+    proxies = Set.new
+    #persisted_proxies = select_valid_persisted_proxies(target)
+    Array(crawlers).each_with_object([]) do |crawler, threads|
       threads << Thread.new do
-        _proxies.each do |proxy|
-          if proxy_available?(proxy.to_s, detect_site)
-            p "Proxy is available: proxy: #{proxy}, url: #{detect_site}"
-            @storage.store(proxy.to_s)
-          else
-            next
-          end
-        end
+        proxies.merge crawler.run
       end
-    end
-    threads.each(&:join)
+    end.each(&:join)
+    @storage.store(select_valid_proxies(proxies, target))
   end
 
   def pick_proxy_for(url)
-    @proxies_for_crawler ||= filter_persisted_proxies_by(url)
+    @proxies_for_crawler ||= select_valid_persisted_proxies(url)
     @proxies_for_crawler.shift
   end
 
-  def filter_persisted_proxies_by(url)
-    threads = []
-    rst = []
-    @storage.get_all.values.each_slice(2) do |proxies|
-      threads << Thread.new do
-        valid_proxies = proxies.each_with_object([]) do |proxy, obj|
-          if proxy_available?(proxy, url)
-            p "Proxy is available: proxy: #{proxy}, url: #{url}"
-            obj << proxy
-          end
-        end
-        Thread.current[:proxy] = valid_proxies
-      end
-    end
-
-    threads.each do |t|
-      t.join
-      rst << t[:proxy] if t[:proxy]
-    end
-    rst.flatten
+  def select_valid_persisted_proxies(target = Config[:beggar][:default_target])
+    select_valid_proxies(@storage.get_all)
   end
 
   def proxy_available?(proxy, url)
@@ -73,19 +42,38 @@ class ProxyBeggar
     true
   end
 
+  def select_valid_proxies(proxies, target = Config[:beggar][:default_target])
+    threads = []
+    valid_proxies = Set.new
+    proxies.each_slice((proxies.size / THREAD_LIMIT).ceil) do |part_proxies|
+      threads << Thread.new do
+        part_proxies.each do |proxy|
+          if proxy_available?(proxy, target)
+            p "Proxy is available: proxy: #{proxy}, url: #{target}"
+            valid_proxies << proxy
+          else
+            next
+          end
+        end
+      end
+    end
+    threads.each(&:join)
+    valid_proxies
+  end
+
   private
 
     def load_crawlers
-      Dir['./proxy_beggar/crawlers/*.rb'].each_with_object([]) do |path, klasses|
+      Dir['./proxy_beggar/crawlers/*.rb'].each_with_object([]) do |path, objs|
         unless path.match?('base_crawler')
           require_relative path
           file_name = path.match(/(\w+)\.rb/)[1]
           klass = self.class.const_get(file_name.split('_').map(&:capitalize).join(''))
-          klasses << klass
+          objs << klass.new
         end
       end
     end
 
 end
 
-ProxyBeggar.new.beg_all
+ProxyBeggar.new.beg
