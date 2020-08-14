@@ -4,29 +4,28 @@ require_relative './proxy_beggar/storage'
 require_relative './proxy_beggar/requestor'
 
 class ProxyBeggar
-  #autoload(:Config, './proxy_beggar/config.rb')
+  autoload(:Config, './proxy_beggar/config.rb')
   attr_reader :requestor
 
-  def initialize(dest_addr)
-    @dest_addr = dest_addr
+  def initialize
     @storage = Storage.new
     @requestor = Requestor.new
   end
 
-  def beg
+  def beg_all(detect_site = "https://www.baidu.com")
     load_crawlers.each do |crawler|
-      beg_to crawler.new
+      beg_to crawler.new, detect_site
     end
   end
 
-  def beg_to(crawler)
+  def beg_to(crawler, detect_site)
     threads = []
     #crawler.requestor.proxy = pick_proxy_for(crawler.url)
     crawler.run.each_slice(5) do |_proxies|
       threads << Thread.new do
         _proxies.each do |proxy|
-          if proxy_available?(proxy.to_s, @dest_addr)
-            p "Proxy is available: proxy: #{proxy}, url: #{@dest_addr}"
+          if proxy_available?(proxy.to_s, detect_site)
+            p "Proxy is available: proxy: #{proxy}, url: #{detect_site}"
             @storage.store(proxy.to_s)
           else
             next
@@ -77,8 +76,7 @@ class ProxyBeggar
   private
 
     def load_crawlers
-      klasses = []
-      Dir['./proxy_beggar/crawlers/*.rb'].each do |path|
+      Dir['./proxy_beggar/crawlers/*.rb'].each_with_object([]) do |path, klasses|
         unless path.match?('base_crawler')
           require_relative path
           file_name = path.match(/(\w+)\.rb/)[1]
@@ -86,9 +84,8 @@ class ProxyBeggar
           klasses << klass
         end
       end
-      klasses
     end
 
 end
 
-ProxyBeggar.new("https://www.baidu.com").beg
+ProxyBeggar.new.beg_all
