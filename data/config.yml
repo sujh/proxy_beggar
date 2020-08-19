@@ -1,8 +1,9 @@
+thread_limit: 50
+
 storage:
   path: "redis://127.0.0.1:6379/1"
   key: "proxy_crawler"
 
-beggar:
+requestor:
   timeout: 2
   default_target: "https://www.baidu.com"
-  thread_limit: 20

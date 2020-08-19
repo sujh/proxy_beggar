@@ -46,5 +46,21 @@ describe ProxyBeggar::Storage do
       assert_equal(%w(v1 v2).sort, @storage.get_all.sort)
     end
   end
+
+  describe "#clean" do
+    it "works" do
+      @storage.store('v1')
+      @storage.clean
+      assert_empty @storage.get_all
+    end
+  end
+
+  describe "#delete" do
+    it "works" do
+      @storage.store(%w(v1 v2 v3))
+      @storage.delete('v2')
+      assert_equal 2, @store_entity.scard(ProxyBeggar::Config[:storage][:key])
+    end
+  end
 end
 

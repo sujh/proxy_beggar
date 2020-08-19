@@ -23,5 +23,13 @@ class ProxyBeggar
     def get_all
       @entity.smembers(Config[:storage][:key])
     end
+
+    def clean
+      @entity.del(Config[:storage][:key])
+    end
+
+    def delete(v)
+      @entity.srem(Config[:storage][:key], v)
+    end
   end
 end

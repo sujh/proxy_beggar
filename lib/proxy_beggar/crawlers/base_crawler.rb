@@ -2,16 +2,18 @@ require 'nokogiri'
 require 'timeout'
 require 'set'
 require_relative '../proxy'
+require_relative '../valid_proxy_pool'
 
 class ProxyBeggar
   class BaseCrawler
     USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 
-    attr_reader :proxies, :requestor
+    attr_reader :raw_proxies, :requestor
 
     def initialize
-      @proxies = Set.new
-      @requestor = Requestor.new
+      @raw_proxies = Set.new
+      @requestor   = Requestor.new
+      @proxy_pool  = ValidProxyPool.instance
     end
 
     def run(page_limit: 10, request_gap_time: 2)
@@ -25,17 +27,18 @@ class ProxyBeggar
           p "Get #{_url} expired(proxy: #{requestor.proxy}), next"
         end
       end
-      proxies
+      raw_proxies
     end
 
     def fetch_doc(url, timeout = 5)
-      retry_count = 0
       begin
-        doc = requestor.get(url, timeout)
+        valid_proxy = @proxy_pool.pick
+        doc = requestor.get(url, timeout, proxy: valid_proxy)
       rescue Timeout::Error => e
-        retry_count += 1
-        timeout += 3
-        retry_count < 3 ? retry : (return nil)
+        return if valid_proxy.nil?
+        @proxy_pool.delete(valid_proxy)
+        p "#{valid_proxy} is invalid, switch"
+        retry
       rescue StandardError => e
         raise(e, "#{e} when visit #{url}")
       end
