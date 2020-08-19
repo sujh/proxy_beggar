@@ -39,8 +39,8 @@ class ProxyBeggar
       valid_proxies.first
     end
 
-    def delete(proxy)
-      @storage.delete(proxy)
+    def delete(proxy, hard_delete = true)
+      @storage.delete(proxy) if hard_delete
       valid_proxies.delete(proxy)
     end
 

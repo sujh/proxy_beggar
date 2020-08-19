@@ -45,17 +45,26 @@ describe ProxyBeggar::ValidProxyPool do
   end
 
   describe "#delete" do
-    it "delete ele from pool" do
-      @pool.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
-      ori_size = @pool.valid_proxies.size
-      assert_equal ori_size - 1, @pool.delete("http://1.1.1.1:1").size
-    end
-
-    it "delete ele form storage" do
+    it "delete ele from pool and storage default" do
       @pool.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
       @pool.send(:refresh_to_storage)
-      ori_size = @pool.instance_variable_get("@storage").get_all.size
-      assert_equal ori_size - 1, @pool.delete("http://1.1.1.1:1").size
+      ori_size = @pool.valid_proxies.size
+      real_size = @pool.delete("http://1.1.1.1:1").size
+      assert_equal ori_size - 1, real_size
+
+      storage_size = @pool.instance_variable_get("@storage").get_all.size
+      assert_equal ori_size - 1, storage_size
+    end
+
+    it "delete ele form only pool when soft delete " do
+      @pool.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
+      @pool.send(:refresh_to_storage)
+      ori_size = @pool.valid_proxies.size
+      real_size = @pool.delete("http://1.1.1.1:1", false).size
+      assert_equal ori_size - 1, real_size
+
+      storage_size = @pool.instance_variable_get("@storage").get_all.size
+      assert_equal ori_size, storage_size
     end
   end
 end
