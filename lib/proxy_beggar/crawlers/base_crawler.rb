@@ -72,10 +72,7 @@ class ProxyBeggar
 
       def record_proxy(ip, port, scheme = 'http')
         #Open-uri can't work with non-http proxy
-        scheme.downcase!
-        if scheme == 'http'
-          raw_proxies << "#{scheme}://#{ip}:#{port}"
-        end
+        raw_proxies << "http://#{ip}:#{port}"
       end
 
   end
