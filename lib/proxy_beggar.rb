@@ -32,5 +32,4 @@ class ProxyBeggar
     end
 
 end
-
-ProxyBeggar.new.beg
+ProxyBeggar.new.beg()

@@ -9,7 +9,6 @@ class ProxyBeggar
     attr_reader :options
 
     def initialize(opts = {})
-      @proxy = nil
       @options = opts.merge("User-Agent" => USER_AGENT, proxy: nil)
     end
 
