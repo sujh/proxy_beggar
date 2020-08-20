@@ -1,7 +1,7 @@
 require_relative './base_crawler'
 
 class ProxyBeggar
-  class Eight9IpCrawler < BaseCrawler
+  class Eight9ipCrawler < BaseCrawler
     def parse_proxies(doc)
       doc.css('table tbody tr').each do |node|
         children = node.css('td').map(&:text).map { |_t| _t.gsub(/\s/, '') }
