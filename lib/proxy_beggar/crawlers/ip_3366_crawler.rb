@@ -7,7 +7,7 @@ class ProxyBeggar
       doc.css('table tbody tr').each do |node|
         children = node.css('td').map(&:text)
         ip_pos, port_pos, proto_pos = 0, 1, 3
-        raw_proxies << Proxy.new(children[proto_pos], children[ip_pos], children[port_pos]).to_s
+        record_proxy(children[ip_pos], children[port_pos], children[proto_pos])
       end
       raw_proxies
     end
