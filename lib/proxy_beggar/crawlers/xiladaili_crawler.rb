@@ -10,7 +10,6 @@ class ProxyBeggar
         proto = tds[1].text.scan(/\w+/).include?('HTTP') ? 'http' : 'https'
         record_proxy(ip, port, proto)
       end
-      raw_proxies
     end
 
     def url(page = 1)

@@ -5,11 +5,12 @@ class ProxyBeggar
 
     def parse_proxies(doc)
       doc.css('table tbody tr').each do |node|
-        children = node.css('td').map(&:text)
-        ip_pos, port_pos, proto_pos = 0, 1, 3
-        record_proxy(children[ip_pos], children[port_pos], children[proto_pos])
+        tds = node.css('td')
+        ip = tds[0].text
+        port = tds[1].text
+        proto = tds[3].text
+        record_proxy(ip, port, proto)
       end
-      raw_proxies
     end
 
     def url(page = 1)

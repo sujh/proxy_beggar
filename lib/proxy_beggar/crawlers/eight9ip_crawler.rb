@@ -4,11 +4,11 @@ class ProxyBeggar
   class Eight9ipCrawler < BaseCrawler
     def parse_proxies(doc)
       doc.css('table tbody tr').each do |node|
-        children = node.css('td').map(&:text).map { |_t| _t.gsub(/\s/, '') }
-        ip_pos, port_pos = 0, 1
-        record_proxy(children[ip_pos], children[port_pos])
+        tds = node.css('td')
+        ip = tds[0].text.strip
+        port = tds[1].text.strip
+        record_proxy(ip, port)
       end
-      raw_proxies
     end
 
     def url(page = 1)

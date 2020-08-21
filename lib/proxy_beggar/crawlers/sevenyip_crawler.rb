@@ -11,7 +11,6 @@ class ProxyBeggar
         proto = tds[3].text.downcase.strip
         record_proxy(ip, port, proto)
       end
-      raw_proxies
     end
 
     def url(page = 1)
