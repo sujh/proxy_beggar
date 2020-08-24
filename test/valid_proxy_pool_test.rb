@@ -21,13 +21,15 @@ describe ProxyBeggar::ValidProxyPool do
   end
 
   describe "#refresh_valid_proxies" do
-    it "return empty set when no valid proxies" do
+    it "valid_proxies is empty when no valid proxies" do
       invalid_proxies = %w(http://1.1.1.1:10 http://2.2.2.2:10)
-      assert_empty @pool.refresh_valid_proxies(invalid_proxies)
+      @pool.refresh_valid_proxies(invalid_proxies)
+      assert_empty @pool.valid_proxies
     end
 
     it "works ok when input proxies is empty" do
-      assert_empty @pool.refresh_valid_proxies([])
+      @pool.refresh_valid_proxies([])
+      assert_empty @pool.valid_proxies
     end
   end
 
@@ -45,11 +47,11 @@ describe ProxyBeggar::ValidProxyPool do
   end
 
   describe "#delete" do
-    it "delete ele from pool and storage default" do
+    it "delete ele from pool and storage" do
       @pool.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
-      @pool.send(:refresh_to_storage)
+      @pool.send(:save_valid_proxies)
       ori_size = @pool.valid_proxies.size
-      real_size = @pool.delete("http://1.1.1.1:1").size
+      real_size = @pool.delete("http://1.1.1.1:1", true).size
       assert_equal ori_size - 1, real_size
 
       storage_size = @pool.instance_variable_get("@storage").get_all.size
@@ -58,7 +60,7 @@ describe ProxyBeggar::ValidProxyPool do
 
     it "delete ele form only pool when soft delete " do
       @pool.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
-      @pool.send(:refresh_to_storage)
+      @pool.send(:save_valid_proxies)
       ori_size = @pool.valid_proxies.size
       real_size = @pool.delete("http://1.1.1.1:1", false).size
       assert_equal ori_size - 1, real_size

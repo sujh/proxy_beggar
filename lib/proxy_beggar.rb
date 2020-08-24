@@ -1,21 +1,24 @@
-require 'set'
 require_relative './proxy_beggar/valid_proxy_pool'
-require_relative './proxy_beggar/config'
 
 class ProxyBeggar
 
-  def initialize
-    @pool = ValidProxyPool.instance
-  end
-
-  def beg(crawlers: load_crawlers, target: Config[:requestor][:default_target])
-    proxies = Set.new
-    Array(crawlers).each_with_object([]) do |crawler, threads|
-      threads << Thread.new do
-        proxies.merge crawler.run
+  def beg(crawlers = load_crawlers)
+    pool = ValidProxyPool.instance
+    Thread.new do
+      loop do
+        sleep 10
+        pool.hard_clear_invalid_proxies
       end
-    end.each(&:join)
-    @pool.refresh_valid_proxies(proxies, target)
+    end
+
+    loop do
+      Array(crawlers).each_with_object([]) do |crawler, threads|
+        threads << Thread.new do
+          crawler.run
+        end
+      end.each(&:join)
+      sleep 10
+    end
   end
 
   private
@@ -32,4 +35,6 @@ class ProxyBeggar
     end
 
 end
-ProxyBeggar.new.beg()
+#require_relative './proxy_beggar/crawlers/sevenyip_crawler'
+#ProxyBeggar.new.beg(ProxyBeggar::SevenyipCrawler.new)
+ProxyBeggar.new.beg
