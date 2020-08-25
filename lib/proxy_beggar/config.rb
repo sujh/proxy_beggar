@@ -8,7 +8,7 @@ class ProxyBeggar
       end
 
       def [](k)
-        rst = @hash[k.to_s]
+        rst = @hash.fetch k.to_s
         if rst.is_a? Hash
           self.class.new rst
         else

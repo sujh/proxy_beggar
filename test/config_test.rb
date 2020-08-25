@@ -13,5 +13,11 @@ describe ProxyBeggar::Config do
       assert_equal ProxyBeggar::Config[:storage][:path], @yml['storage']['path']
       assert_equal ProxyBeggar::Config['storage']['path'], @yml['storage']['path']
     end
+
+    it "raise error when no key found" do
+      assert_raises(KeyError) {
+        ProxyBeggar::Config[:no_such_object]
+      }
+    end
   end
 end
