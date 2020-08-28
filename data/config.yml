@@ -1,5 +1,9 @@
 thread_limit: 50
 
+begger:
+  crawl_gap_time: 10
+  clean_gap_time: 10
+
 storage:
   path: "redis://127.0.0.1:6379/1"
   key: "proxy_crawler"
