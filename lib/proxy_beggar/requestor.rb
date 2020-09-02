@@ -12,8 +12,8 @@ class ProxyBeggar
       @options = opts.merge("User-Agent" => USER_AGENT, proxy: nil)
     end
 
-    def get(url, timeout = 5, **opts)
-      Timeout.timeout(timeout) { URI.open(url, **options.merge!(**opts)) }
+    def get(url, time_limit = Config[:requestor][:time_limit], **opts)
+      Timeout.timeout(time_limit) { URI.open(url, **options.merge!(**opts)) }
     end
 
     def test_proxy(proxy, url)

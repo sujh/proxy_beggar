@@ -1,10 +1,10 @@
 require 'nokogiri'
 require 'timeout'
 require_relative '../valid_proxy_pool'
+require_relative '../config'
 
 class ProxyBeggar
   class BaseCrawler
-    USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 
     attr_reader :raw_proxies, :requestor
 
@@ -14,7 +14,7 @@ class ProxyBeggar
       @proxy_pool  = ValidProxyPool.instance
     end
 
-    def run(page_limit: 10)
+    def run(page_limit = self.page_limit)
       (1..page_limit).each do |page|
         _url = url(page)
         if doc = fetch_doc(_url)
@@ -29,10 +29,10 @@ class ProxyBeggar
       end
     end
 
-    def fetch_doc(url, timeout = 5)
+    def fetch_doc(url, time_limit = self.time_limit)
       begin
         valid_proxy = @proxy_pool.pick
-        doc = requestor.get(url, timeout, proxy: valid_proxy)
+        doc = requestor.get(url, time_limit, proxy: valid_proxy)
         return Nokogiri::HTML(doc)
       rescue Timeout::Error => e
         return if valid_proxy.nil?
@@ -53,11 +53,24 @@ class ProxyBeggar
       raise "Abstract method, should be implemented in subclass"
     end
 
+    def page_limit
+      crawler_config(:page_limit) || 10
+    end
+
+    def time_limit
+      crawler_config(:time_limit) || 5
+    end
+
     private
 
       def record_proxy(ip, port, scheme = 'http')
         #Open-uri can't work with non-http proxy
         raw_proxies << "http://#{ip}:#{port}"
+      end
+
+      def crawler_config(key)
+        @crawler_config ||= Config.dig('crawlers', self.class.to_s.split('::')[-1])
+        @crawler_config&.[](key.to_s)
       end
 
   end

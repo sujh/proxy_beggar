@@ -21,7 +21,7 @@ class ProxyBeggar
       @valid_proxies = persisted_proxies
     end
 
-    def refresh_valid_proxies(proxies, target = Config[:requestor][:default_target])
+    def refresh_valid_proxies(proxies, target = Config[:requestor][:target])
       return if proxies.empty?
       thread_limit = Config[:thread_limit].to_f
       proxies.each_slice((proxies.size / thread_limit).ceil).with_object([]) do |part_proxies, threads|
@@ -45,7 +45,7 @@ class ProxyBeggar
       valid_proxies.delete(proxy)
     end
 
-    def hard_clear_invalid_proxies(target = Config[:requestor][:default_target])
+    def hard_clear_invalid_proxies(target = Config[:requestor][:target])
       proxies = persisted_proxies
       return if proxies.empty?
       thread_limit = 5.0

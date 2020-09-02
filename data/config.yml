@@ -9,5 +9,12 @@ storage:
   key: "proxy_crawler"
 
 requestor:
-  timeout: 2
-  default_target: "https://www.baidu.com"
+  target: "https://www.baidu.com"
+  time_limit: 5
+
+crawlers:
+  SevenyipCrawler:
+    page_limit: 10
+    time_limit: 5
+  Ip3366Crawler:
+    page_limit: 10
