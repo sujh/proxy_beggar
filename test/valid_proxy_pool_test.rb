@@ -21,9 +21,11 @@ describe ProxyBeggar::ValidProxyPool do
   end
 
   describe "#refresh_valid_proxies" do
-    it "valid_proxies is empty when no valid proxies" do
-      invalid_proxies = %w(http://1.1.1.1:10 http://2.2.2.2:10)
-      @pool.refresh_valid_proxies(invalid_proxies)
+    it "valid_proxies is empty when all candidate proxies can't work " do
+      invalid_proxies = [Object.new, Object.new]
+      @pool.requestor.stub :test_proxy, false do
+        @pool.refresh_valid_proxies(invalid_proxies)
+      end
       assert_empty @pool.valid_proxies
     end
 
@@ -31,13 +33,21 @@ describe ProxyBeggar::ValidProxyPool do
       @pool.refresh_valid_proxies([])
       assert_empty @pool.valid_proxies
     end
+
+    it "works when some candidate proxies ok " do
+      proxies = ['proxy_dummy1', 'proxy_dummy2']
+      @pool.requestor.stub :test_proxy, true do
+        @pool.refresh_valid_proxies(proxies)
+      end
+      assert_equal @pool.valid_proxies.size, proxies.size
+    end
   end
 
   describe "#pick" do
     it "works" do
-      expected_value = "http://1.1.1.1:1"
-      @pool.valid_proxies << expected_value << "http://1.2.2.2:2"
-      assert_equal expected_value, @pool.pick
+      proxies = %w(http://1.1.1.1:1 http://1.2.2.2:2)
+      proxies.each { |pxy| @pool.valid_proxies << pxy }
+      assert_includes proxies, @pool.pick
     end
 
     it "works when valid proxies is empty" do
