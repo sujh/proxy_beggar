@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+require_relative '../lib/proxy_beggar'
+require_relative '../lib/proxy_beggar/requestor'
+
+requestor = ProxyBeggar::Requestor.new
+ok_crawlers, timeout_crawlers, slow_crawlers = [], [], []
+max_response_time = 0
+all_crawlers = ProxyBeggar.load_crawlers
+
+all_crawlers.each_with_object([]) do |crawler, threads|
+  threads << Thread.new do
+    time_limit = ProxyBeggar::Config[:requestor][:time_limit]
+    retry_count = 0
+    begin
+      requestor.get(crawler.url, time_limit)
+      if time_limit == ProxyBeggar::Config[:requestor][:time_limit]
+        ok_crawlers << crawler.class
+      else
+        slow_crawlers << crawler.class
+        max_response_time = time_limit if time_limit > max_response_time
+      end
+    rescue StandardError => e
+      retry_count += 1
+      if retry_count < 1
+        time_limit += 3
+        retry
+      else
+        timeout_crawlers << crawler.class
+      end
+    end
+  end
+end.each(&:join)
+
+if !ok_crawlers.empty?
+  if ok_crawlers.size == all_crawlers.size
+    p "All crawlers are ready"
+  else
+    p "#{ok_crawlers.join(', ')} are ready"
+  end
+end
+
+if !timeout_crawlers.empty?
+  p "Warning: #{timeout_crawlers.join(', ')} timeout after request many times, please check the websites: "\
+  "#{timeout_crawlers.map{ |klass| klass.new.url }.join(', ')}"
+end
+
+if !slow_crawlers.empty?
+  p "Warning: #{slow_crawlers.join(', ')} is slow, max response time is near #{max_response_time} seconds, "\
+  "you can modify crawler's time_limit in data/config file"
+end
