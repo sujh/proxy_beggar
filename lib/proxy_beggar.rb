@@ -1,14 +1,14 @@
-require_relative './proxy_beggar/valid_proxy_pool'
+require_relative './proxy_beggar/proxy_manager'
 require_relative './proxy_beggar/config'
 
 class ProxyBeggar
 
   def beg(crawlers = ProxyBeggar.load_crawlers)
     Thread.new do
-      pool = ValidProxyPool.instance
+      manager = ProxyManager.instance
       loop do
         sleep Config[:begger][:clean_gap_time]
-        pool.hard_clear_invalid_proxies
+        manager.hard_clear_invalid_proxies
       end
     end
 

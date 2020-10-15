@@ -1,6 +1,6 @@
 require 'nokogiri'
 require 'timeout'
-require_relative '../valid_proxy_pool'
+require_relative '../proxy_manager'
 require_relative '../config'
 
 class ProxyBeggar
@@ -11,7 +11,7 @@ class ProxyBeggar
     def initialize
       @raw_proxies = []
       @requestor   = Requestor.new
-      @proxy_pool  = ValidProxyPool.instance
+      @manager  = ProxyManager.instance
     end
 
     def run(page_limit = self.page_limit)
@@ -20,8 +20,8 @@ class ProxyBeggar
         if doc = fetch_doc(_url)
           parse_proxies doc
           p "Success for #{_url}(proxy: #{requestor.proxy})"
-          @proxy_pool.refresh_valid_proxies(raw_proxies)
-          @proxy_pool.save_valid_proxies
+          @manager.refresh_valid_proxies(raw_proxies)
+          @manager.save_valid_proxies
           raw_proxies.clear
         else
           p "Get #{_url} failed(proxy: #{requestor.proxy}), next"
@@ -31,16 +31,16 @@ class ProxyBeggar
 
     def fetch_doc(url, time_limit = self.time_limit)
       begin
-        valid_proxy = @proxy_pool.pick
+        valid_proxy = @manager.pick
         doc = requestor.get(url, time_limit, proxy: valid_proxy)
         return Nokogiri::HTML(doc)
       rescue Timeout::Error => e
         return if valid_proxy.nil?
-        @proxy_pool.delete(valid_proxy)
+        @manager.delete(valid_proxy)
         p "#{valid_proxy} is expired, soft delete and switch"
         retry
       rescue StandardError => e
-        @proxy_pool.delete(valid_proxy)
+        @manager.delete(valid_proxy)
         p "#{e}, proxy: #{valid_proxy}, url: #{url}" and retry
       end
     end

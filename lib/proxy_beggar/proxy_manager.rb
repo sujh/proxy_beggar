@@ -5,14 +5,14 @@ require_relative './storage'
 
 class ProxyBeggar
   # Some proxies can't visit crawler's url, but can visit normal site. These proxies will be deleted form
-  # valid_proxies, but will remain in storage. Crawlers should use ValidProxyPool's proxies instead of storage's.
+  # valid_proxies, but will remain in storage. Crawlers should use ProxyManager's proxies instead of storage's.
 
-  class ValidProxyPool
+  class ProxyManager
     attr_reader :requestor, :valid_proxies
     private_class_method :new
 
     def self.instance(requestor: Requestor.new)
-      @pool ||= new(requestor)
+      @manager ||= new(requestor)
     end
 
     def initialize(requestor)
