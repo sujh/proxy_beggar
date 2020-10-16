@@ -19,7 +19,7 @@ class ProxyBeggar
       begin
         !!get(url, proxy: proxy)
       rescue StandardError => e
-        p "Proxy unavailable: proxy: #{proxy}, url: #{url}, cause: #{e}"
+        p "Proxy unavailable: proxy: #{proxy}, cause: #{e}"
         return false
       end
     end

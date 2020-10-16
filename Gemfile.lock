@@ -11,6 +11,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     public_suffix (4.0.6)
     redis (4.2.1)
+    thread (0.2.2)
     webmock (3.9.2)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -23,6 +24,7 @@ DEPENDENCIES
   minitest
   nokogiri
   redis
+  thread
   webmock
 
 BUNDLED WITH

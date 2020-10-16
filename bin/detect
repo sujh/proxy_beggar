@@ -40,7 +40,7 @@ if !ok_crawlers.empty?
 end
 
 if !timeout_crawlers.empty?
-  p "Warning: #{timeout_crawlers.join(', ')} timeout after request many times, please check the websites: "\
+  p "Warning: #{timeout_crawlers.join(', ')} occurred timeout after request many times, please check the websites: "\
   "#{timeout_crawlers.map{ |klass| klass.new.url }.join(', ')}"
 end
 

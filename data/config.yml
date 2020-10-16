@@ -1,4 +1,7 @@
-thread_limit: 50
+manager:
+  #Refresher's thread pool size, it's better to set it greater than NUM_OF_CRAWLER * 5
+  refresher_threads: 50
+  clearer_threads: 5
 
 begger:
   crawl_gap_time: 10
@@ -10,7 +13,8 @@ storage:
 
 requestor:
   target: "https://www.baidu.com"
-  time_limit: 5
+  #Global time for wait response
+  time_limit: 8
   user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 
 crawlers:
