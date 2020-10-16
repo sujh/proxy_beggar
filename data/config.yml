@@ -1,9 +1,9 @@
 manager:
   #Refresher's thread pool size, it's better to set it greater than NUM_OF_CRAWLER * 5
-  refresher_threads: 50
+  refresher_threads: 10
   clearer_threads: 5
 
-begger:
+beggar:
   crawl_gap_time: 10
   clean_gap_time: 10
 

@@ -2,4 +2,11 @@
 
 require_relative '../lib/proxy_beggar'
 
-ProxyBeggar.new.beg
+beggar = ProxyBeggar.new
+at_exit do
+  manager = ProxyBeggar::ProxyManager.instance
+  manager.instance_variable_get('@refresher_pool').shutdown!
+  manager.instance_variable_get('@clearer_pool').shutdown!
+end
+
+beggar.beg

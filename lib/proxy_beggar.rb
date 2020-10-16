@@ -7,7 +7,7 @@ class ProxyBeggar
     Thread.new do
       manager = ProxyManager.instance
       loop do
-        sleep Config[:begger][:clean_gap_time]
+        sleep Config[:beggar][:clean_gap_time]
         manager.hard_clear_invalid_proxies
       end
     end
@@ -16,7 +16,7 @@ class ProxyBeggar
       threads << Thread.new do
         loop do
           crawler.run
-          sleep Config[:begger][:crawl_gap_time]
+          sleep Config[:beggar][:crawl_gap_time]
         end
       end
     end.each(&:join)
