@@ -34,6 +34,3 @@ class ProxyBeggar
   end
 
 end
-# require_relative './proxy_beggar/crawlers/sevenyip_crawler'
-# ProxyBeggar.new.beg(ProxyBeggar::SevenyipCrawler.new)
-# ProxyBeggar.new.beg

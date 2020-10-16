@@ -58,7 +58,7 @@ class ProxyBeggar
     end
 
     def time_limit
-      crawler_config(:time_limit) || 5
+      crawler_config(:time_limit) || Config[:requestor][:time_limit]
     end
 
     private
