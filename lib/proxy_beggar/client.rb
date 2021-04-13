@@ -3,15 +3,15 @@ require 'open-uri'
 require 'set'
 require_relative './config'
 class ProxyBeggar
-  class Requestor
+  class Client
 
     attr_reader :options
 
     def initialize(opts = {})
-      @options = opts.merge("User-Agent" => Config[:requestor][:user_agent], proxy: nil)
+      @options = opts.merge("User-Agent" => Config[:client][:user_agent], proxy: nil)
     end
 
-    def get(url, time_limit = Config[:requestor][:time_limit], **opts)
+    def get(url, time_limit = Config[:client][:time_limit], **opts)
       Timeout.timeout(time_limit) { URI.open(url, **options.merge!(**opts)) }
     end
 

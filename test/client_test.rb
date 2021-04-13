@@ -2,12 +2,12 @@ require 'minitest'
 require 'minitest/autorun'
 require 'minitest/spec'
 require 'webmock/minitest'
-require_relative '../lib/proxy_beggar/requestor'
+require_relative '../lib/proxy_beggar/client'
 
-describe ProxyBeggar::Requestor do
+describe ProxyBeggar::Client do
 
   before :each do
-    @requestor = ProxyBeggar::Requestor.new
+    @client = ProxyBeggar::Client.new
   end
 
   describe '#get' do
@@ -15,14 +15,14 @@ describe ProxyBeggar::Requestor do
       dummy_url = 'http://1.1.1.1:1'
       stub_request(:any, dummy_url).to_timeout
       assert_raises Timeout::Error do
-        @requestor.get(dummy_url)
+        @client.get(dummy_url)
       end
     end
 
     it 'works' do
       dummy_url = 'http://1.1.1.1:1'
       stub_request(:get, dummy_url)
-      assert @requestor.get(dummy_url)
+      assert @client.get(dummy_url)
     end
   end
 
@@ -31,17 +31,17 @@ describe ProxyBeggar::Requestor do
       dummy_proxy = 'http://1.1.1.1:1'
       dummy_url = 'http://2.2.2.2:2'
       stub_request(:get, dummy_url).to_timeout
-      assert_equal false, @requestor.test_proxy(dummy_proxy, dummy_url)
+      assert_equal false, @client.test_proxy(dummy_proxy, dummy_url)
       assert_output /proxy/ do
-        @requestor.test_proxy(dummy_proxy, dummy_url)
+        @client.test_proxy(dummy_proxy, dummy_url)
       end
     end
 
-    it 'return true when visit url successs via proxy' do
+    it 'return true when visit url success via proxy' do
       dummy_proxy = 'http://1.1.1.1:1'
       dummy_url = 'http://2.2.2.2:2'
       stub_request(:get, dummy_url)
-      assert @requestor.test_proxy(dummy_proxy, dummy_url)
+      assert @client.test_proxy(dummy_proxy, dummy_url)
     end
   end
 

@@ -23,7 +23,7 @@ describe ProxyBeggar::ProxyManager do
   describe "#refresh_valid_proxies" do
     it "valid_proxies is empty when all candidate proxies can't work " do
       invalid_proxies = [Object.new, Object.new]
-      @manager.requestor.stub :test_proxy, false do
+      @manager.client.stub :test_proxy, false do
         @manager.refresh_valid_proxies(invalid_proxies)
       end
       assert_empty @manager.valid_proxies
@@ -36,7 +36,7 @@ describe ProxyBeggar::ProxyManager do
 
     it "works when some candidate proxies ok " do
       proxies = ['proxy_dummy1', 'proxy_dummy2']
-      @manager.requestor.stub :test_proxy, true do
+      @manager.client.stub :test_proxy, true do
         @manager.refresh_valid_proxies(proxies)
       end
       assert_equal @manager.valid_proxies.size, proxies.size
