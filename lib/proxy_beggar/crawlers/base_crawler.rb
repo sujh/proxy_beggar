@@ -6,7 +6,7 @@ require_relative '../config'
 class ProxyBeggar
   class BaseCrawler
 
-    attr_reader :raw_proxies, :requestor
+    attr_reader :raw_proxies, :client
 
     def initialize
       @raw_proxies = []
