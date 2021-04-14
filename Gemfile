@@ -8,6 +8,7 @@ gem 'nokogiri'
 gem 'redis'
 gem 'thread'
 gem "rake"
+gem "rack"
 
 group :test do
   gem 'minitest'

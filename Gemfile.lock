@@ -10,6 +10,7 @@ GEM
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     public_suffix (4.0.6)
+    rack (2.2.3)
     rake (13.0.1)
     redis (4.2.1)
     thread (0.2.2)
@@ -24,6 +25,7 @@ PLATFORMS
 DEPENDENCIES
   minitest
   nokogiri
+  rack
   rake
   redis
   thread
