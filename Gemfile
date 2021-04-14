@@ -7,6 +7,7 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 gem 'nokogiri'
 gem 'redis'
 gem 'thread'
+gem "rake"
 
 group :test do
   gem 'minitest'

@@ -10,10 +10,6 @@ describe ProxyBeggar::ProxyManager do
     @manager.valid_proxies.clear
   end
 
-  after :each do
-    @manager.valid_proxies.clear
-  end
-
   describe "#instance" do
     it "return singleton object" do
       assert_equal @manager, ProxyBeggar::ProxyManager.instance
@@ -68,7 +64,7 @@ describe ProxyBeggar::ProxyManager do
       assert_equal ori_size - 1, storage_size
     end
 
-    it "delete ele form only manager when soft delete " do
+    it "delete ele from only manager when soft delete " do
       @manager.valid_proxies << "http://1.1.1.1:1" << "http://1.2.2.2:2"
       @manager.send(:save_valid_proxies)
       ori_size = @manager.valid_proxies.size

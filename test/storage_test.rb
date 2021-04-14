@@ -8,6 +8,7 @@ describe ProxyBeggar::Storage do
   before :each do
     @storage = ProxyBeggar::Storage.new(url: "redis://127.0.0.1:6379/2")
     @store_entity = @storage.instance_variable_get('@entity')
+    @store_entity.del(ProxyBeggar::Config[:storage][:key])
   end
 
   after :each do
