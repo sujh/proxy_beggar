@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# Check that all proxy service providers' sites are working.
 require_relative '../lib/proxy_beggar'
 require_relative '../lib/proxy_beggar/client'
 
